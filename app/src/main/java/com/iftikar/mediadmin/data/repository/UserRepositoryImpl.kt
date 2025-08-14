@@ -3,6 +3,7 @@ package com.iftikar.mediadmin.data.repository
 import android.util.Log
 import com.iftikar.mediadmin.data.remote.ApiOperation
 import com.iftikar.mediadmin.data.remote.ApiService
+import com.iftikar.mediadmin.domain.model.ApproveUserResponse
 import com.iftikar.mediadmin.domain.model.User
 import com.iftikar.mediadmin.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
@@ -53,4 +54,55 @@ class UserRepositoryImpl @Inject constructor(private val apiService: ApiService)
             emit(ApiOperation.Failure(e))
         }
     }
+
+    override suspend fun approveUser(
+        userId: String,
+        approval: Int
+    ): ApiOperation<ApproveUserResponse> {
+        val response = apiService.approveUser(userId = userId, approve = approval)
+        return try {
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    ApiOperation.Success(
+                        data = body
+                    )
+                } else {
+                    ApiOperation.Failure(
+                        exception = NullPointerException("Operation failed")
+                    )
+                }
+            } else {
+                ApiOperation.Failure(
+                    exception = HttpException(response)
+                )
+            }
+        } catch (e: Exception) {
+            return ApiOperation.Failure(
+                exception = e
+            )
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

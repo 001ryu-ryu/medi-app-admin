@@ -17,12 +17,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 
 @Composable
 fun UsersScreen(
@@ -103,7 +105,13 @@ private fun UserScreenNavHost(
         }
 
         composable<BottomBarScreensRoute.SpecificUserScreen> {
-            TestSpecificUser()
+            val userId = it.toRoute<BottomBarScreensRoute.SpecificUserScreen>().userId
+            val viewModel = hiltViewModel<SpecificUserViewModel>(
+                key = "user- $userId"
+            )
+            SpecificUserScreen(
+                specificUserViewModel = viewModel
+            )
         }
     }
 }
@@ -111,11 +119,20 @@ private fun UserScreenNavHost(
 @Composable
 private fun RequestsNavHost() {
     val requestNavController = rememberNavController()
-    NavHost(navController = requestNavController, startDestination = BottomBarScreensRoute.TestRequestScreen1) {
-        composable<BottomBarScreensRoute.TestRequestScreen1> {
-            Text(
-                text = "Request test screen 1",
-                modifier = Modifier.systemBarsPadding()
+    NavHost(navController = requestNavController, startDestination = BottomBarScreensRoute.RequestScreen) {
+        composable<BottomBarScreensRoute.RequestScreen> {
+            RequestsScreen(
+                navHostController = requestNavController
+            )
+        }
+
+        composable<BottomBarScreensRoute.SpecificUserScreen> {
+            val userId = it.toRoute<BottomBarScreensRoute.SpecificUserScreen>().userId
+            val viewModel = hiltViewModel<SpecificUserViewModel>(
+                key = "user- $userId"
+            )
+            SpecificUserScreen(
+                specificUserViewModel = viewModel
             )
         }
     }

@@ -26,7 +26,7 @@ class UsersScreenViewModel @Inject constructor(private val getAllUsersUseCase: G
             getAllUsersUseCase().collect { apiOperation ->
                 apiOperation.onSuccess { users ->
                     _state.value = UsersScreenState.Success(
-                        users = users
+                        data = users
                     )
                 }.onFailure { exception ->
                     _state.value = UsersScreenState.Failure(

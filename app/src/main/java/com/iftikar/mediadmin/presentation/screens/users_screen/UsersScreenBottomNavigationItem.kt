@@ -24,17 +24,11 @@ sealed class BottomBarScreensRoute {
     @Serializable
     object AllUsersScreen : BottomBarScreensRoute()
     @Serializable
-    object SpecificUserScreen : BottomBarScreensRoute()
+    data class SpecificUserScreen(val userId: String) : BottomBarScreensRoute()
     @Serializable
-    object TestUserScreen2 : BottomBarScreensRoute()
-    @Serializable
-    object TestRequestScreen1 : BottomBarScreensRoute()
-    @Serializable
-    object TestRequestScreen2 : BottomBarScreensRoute()
+    object RequestScreen : BottomBarScreensRoute()
     @Serializable
     object TestBlockScreen1 : BottomBarScreensRoute()
-    @Serializable
-    object TestBlockScreen2 : BottomBarScreensRoute()
 
 
 }

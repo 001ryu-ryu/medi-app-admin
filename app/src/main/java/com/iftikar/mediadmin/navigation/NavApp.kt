@@ -18,7 +18,7 @@ fun NavApp() {
         }
 
         composable<Routes.UsersScreen> {
-            UsersScreen()
+            UsersScreen(navHostController = navHostController)
         }
     }
 }

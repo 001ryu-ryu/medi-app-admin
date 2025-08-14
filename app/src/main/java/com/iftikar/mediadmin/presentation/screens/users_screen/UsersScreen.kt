@@ -16,9 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,23 +29,50 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.iftikar.mediadmin.R
+import com.iftikar.mediadmin.domain.model.User
 import com.iftikar.mediadmin.util.initialsFrom
 
 @Composable
-fun UsersScreen() {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+fun UsersScreen(
+    viewModel: UsersScreenViewModel = hiltViewModel(),
+    navHostController: NavHostController
+) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
+
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            NavigationBar {
+
+            }
+        }) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            items(dummyList) { user ->
-                UserItem(
-                    text = user.name,
-                    phoneNumber = user.phoneNumber
-                ) { }
+            when(val usersState = state.value) {
+                is UsersScreenState.Failure -> {
+                    // todo handle failure
+                }
+                UsersScreenState.Idle -> {}
+                UsersScreenState.Loading -> {
+                    // todo shimmer effect
+                }
+                is UsersScreenState.Success -> {
+                    usersState.users?.let { users ->
+                        items(users.filter { it.isApproved == 1 && it.block == 0 }) {user ->
+                            UserItem(
+                                user = user,
+                                onClick = {}
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -51,8 +80,7 @@ fun UsersScreen() {
 
 @Composable
 private fun UserItem(
-    text: String,
-    phoneNumber: String,
+    user: User,
     onClick: () -> Unit
 ) {
     Card(
@@ -77,12 +105,12 @@ private fun UserItem(
             ) {
                 SubcomposeAsyncImage(
                     model = R.drawable.user_profile,
-                    contentDescription = text,
+                    contentDescription = user.name,
                     modifier = Modifier.matchParentSize(),
                     contentScale = ContentScale.Crop
                 )
                 Text(
-                    text = initialsFrom(text),
+                    text = initialsFrom(user.name),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
@@ -92,42 +120,21 @@ private fun UserItem(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = text.uppercase(),
+                    text = user.name.uppercase(),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = phoneNumber.uppercase(),
+                    text = user.phoneNumber.uppercase(),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-
-
             }
         }
     }
 }
 
-data class SampleUser(
-    val name: String,
-    val phoneNumber: String
-)
-
-
-
-val dummyList: List<SampleUser> = listOf(
-    SampleUser(name = "Alice Johnson", phoneNumber = "+1 415-555-0101"),
-    SampleUser(name = "Benjamin Lee", phoneNumber = "+1 415-555-0102"),
-    SampleUser(name = "Charlotte Davis", phoneNumber = "+1 415-555-0103"),
-    SampleUser(name = "Daniel Martinez", phoneNumber = "+1 415-555-0104"),
-    SampleUser(name = "Emily Clark", phoneNumber = "+1 415-555-0105"),
-    SampleUser(name = "Franklin Nguyen", phoneNumber = "+1 415-555-0106"),
-    SampleUser(name = "Grace Kim", phoneNumber = "+1 415-555-0107"),
-    SampleUser(name = "Henry Thompson", phoneNumber = "+1 415-555-0108"),
-    SampleUser(name = "Isabella Rodriguez", phoneNumber = "+1 415-555-0109"),
-    SampleUser(name = "Jack Wilson", phoneNumber = "+1 415-555-0110")
-)
 
 
 

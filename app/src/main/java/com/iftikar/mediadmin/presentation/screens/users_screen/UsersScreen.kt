@@ -1,143 +1,163 @@
 package com.iftikar.mediadmin.presentation.screens.users_screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.VerifiedUser
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import coil.compose.SubcomposeAsyncImage
-import com.iftikar.mediadmin.R
-import com.iftikar.mediadmin.domain.model.User
-import com.iftikar.mediadmin.util.initialsFrom
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun UsersScreen(
-    viewModel: UsersScreenViewModel = hiltViewModel(),
-    navHostController: NavHostController
 ) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    // Use a dedicated controller for the Users screen's internal navigation
+    val usersRootNavController = rememberNavController()
 
-    Scaffold(modifier = Modifier.fillMaxSize(),
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar {
-
-            }
-        }) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            BottomNavigationBar(
+                usersNavHostController = usersRootNavController
+            )
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = usersRootNavController,
+            modifier = Modifier.padding(innerPadding),
+            startDestination = BottomBarRoutes.Users.route
         ) {
-            when(val usersState = state.value) {
-                is UsersScreenState.Failure -> {
-                    // todo handle failure
-                }
-                UsersScreenState.Idle -> {}
-                UsersScreenState.Loading -> {
-                    // todo shimmer effect
-                }
-                is UsersScreenState.Success -> {
-                    usersState.users?.let { users ->
-                        items(users.filter { it.isApproved == 1 && it.block == 0 }) {user ->
-                            UserItem(
-                                user = user,
-                                onClick = {}
-                            )
-                        }
-                    }
-                }
+            composable(BottomBarRoutes.Users.route) {
+                UserScreenNavHost()
+            }
+
+            composable(BottomBarRoutes.Requests.route) {
+                RequestsNavHost()
+            }
+
+            composable(BottomBarRoutes.BlockList.route) {
+                BlockListNavHost()
             }
         }
     }
 }
 
 @Composable
-private fun UserItem(
-    user: User,
-    onClick: () -> Unit
+private fun BottomNavigationBar(
+    usersNavHostController: NavHostController
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.padding(6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                SubcomposeAsyncImage(
-                    model = R.drawable.user_profile,
-                    contentDescription = user.name,
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.Crop
-                )
-                Text(
-                    text = initialsFrom(user.name),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
-                )
-            }
+    val navBackStackEntry = usersNavHostController.currentBackStackEntryAsState()
 
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = user.name.uppercase(),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = user.phoneNumber.uppercase(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+    NavigationBar {
+        bottomNavigationItems.forEach { item ->
+            val isSelected = item.route == navBackStackEntry.value?.destination?.route
+            NavigationBarItem(
+                selected = isSelected,
+                label = {
+                    Text(item.title)
+                },
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                        contentDescription = item.title
+                    )
+                },
+                onClick = {
+                    usersNavHostController.navigate(item.route) {
+                        popUpTo(usersNavHostController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun UserScreenNavHost(
+) {
+    val userScreenChildNavHostController = rememberNavController()
+    NavHost(navController = userScreenChildNavHostController, startDestination = BottomBarScreensRoute.AllUsersScreen) {
+        composable<BottomBarScreensRoute.AllUsersScreen> {
+
+            AllUsersScreen(navHostController = userScreenChildNavHostController)
+        }
+
+        composable<BottomBarScreensRoute.SpecificUserScreen> {
+            TestSpecificUser()
+        }
+    }
+}
+
+@Composable
+private fun RequestsNavHost() {
+    val requestNavController = rememberNavController()
+    NavHost(navController = requestNavController, startDestination = BottomBarScreensRoute.TestRequestScreen1) {
+        composable<BottomBarScreensRoute.TestRequestScreen1> {
+            Text(
+                text = "Request test screen 1",
+                modifier = Modifier.systemBarsPadding()
+            )
         }
     }
 }
 
 
+@Composable
+private fun BlockListNavHost() {
+    val blocklistNavController = rememberNavController()
+    NavHost(navController = blocklistNavController, startDestination = BottomBarScreensRoute.TestBlockScreen1) {
+        composable<BottomBarScreensRoute.TestBlockScreen1> {
+            Text(
+                text = "Block test screen 1",
+                modifier = Modifier.systemBarsPadding()
+            )
+        }
+    }
+}
 
 
+private val bottomNavigationItems = listOf(
+    UsersScreenBottomNavigationItem(
+        route = BottomBarRoutes.Users.route,
+        title = "Users",
+        selectedIcon = Icons.Filled.Groups,
+        unselectedIcon = Icons.Outlined.Groups
+    ),
+
+    UsersScreenBottomNavigationItem(
+        route = BottomBarRoutes.Requests.route,
+        title = "Requests",
+        selectedIcon = Icons.Filled.VerifiedUser,
+        unselectedIcon = Icons.Outlined.VerifiedUser
+    ),
+
+    UsersScreenBottomNavigationItem(
+        route = BottomBarRoutes.BlockList.route,
+        title = "Blocklist",
+        selectedIcon = Icons.Filled.Block,
+        unselectedIcon = Icons.Outlined.Block
+    )
+)
 
 
 

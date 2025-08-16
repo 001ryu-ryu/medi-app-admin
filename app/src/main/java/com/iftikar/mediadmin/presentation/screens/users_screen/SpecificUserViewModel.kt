@@ -51,15 +51,17 @@ class SpecificUserViewModel @Inject constructor(
                     }
                 }.onFailure { exception ->
                     _state.update {
-                        it.copy(isLoading = false,
-                            error = exception.message ?: "Some error occurred!")
+                        it.copy(
+                            isLoading = false,
+                            error = exception.message ?: "Some error occurred!"
+                        )
                     }
                 }
             }
         }
     }
 
-    fun approveUser(approval: Int ) {
+    fun approveUser(approval: Int) {
         viewModelScope.launch {
 
             approveUserUseCase(userId = userId, approval = approval).onSuccess {

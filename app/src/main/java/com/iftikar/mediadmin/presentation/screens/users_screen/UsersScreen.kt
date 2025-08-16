@@ -25,10 +25,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.iftikar.mediadmin.shared.SharedUiEventViewModel
 
 @Composable
 fun UsersScreen(
 ) {
+    val sharedUiEventViewModel: SharedUiEventViewModel = hiltViewModel()
     val usersRootNavController = rememberNavController()
 
     Scaffold(
@@ -45,11 +47,15 @@ fun UsersScreen(
             startDestination = BottomBarRoutes.Users.route
         ) {
             composable(BottomBarRoutes.Users.route) {
-                UserScreenNavHost()
+                UserScreenNavHost(
+                    sharedUiEventViewModel = sharedUiEventViewModel
+                )
             }
 
             composable(BottomBarRoutes.Requests.route) {
-                RequestsNavHost()
+                RequestsNavHost(
+                    sharedUiEventViewModel = sharedUiEventViewModel
+                )
             }
 
             composable(BottomBarRoutes.BlockList.route) {
@@ -95,12 +101,18 @@ private fun BottomNavigationBar(
 
 @Composable
 private fun UserScreenNavHost(
+    sharedUiEventViewModel: SharedUiEventViewModel,
 ) {
     val userScreenChildNavHostController = rememberNavController()
-    NavHost(navController = userScreenChildNavHostController, startDestination = BottomBarScreensRoute.AllUsersScreen) {
+    NavHost(
+        navController = userScreenChildNavHostController,
+        startDestination = BottomBarScreensRoute.AllUsersScreen
+    ) {
         composable<BottomBarScreensRoute.AllUsersScreen> {
 
-            AllUsersScreen(navHostController = userScreenChildNavHostController)
+            AllUsersScreen(
+                sharedUiEventViewModel = sharedUiEventViewModel,
+                navHostController = userScreenChildNavHostController)
         }
 
         composable<BottomBarScreensRoute.SpecificUserScreen> {
@@ -109,6 +121,7 @@ private fun UserScreenNavHost(
                 key = "user- $userId"
             )
             SpecificUserScreen(
+                sharedUiEventViewModel = sharedUiEventViewModel,
                 specificUserViewModel = viewModel,
             )
         }
@@ -116,11 +129,17 @@ private fun UserScreenNavHost(
 }
 
 @Composable
-private fun RequestsNavHost() {
+private fun RequestsNavHost(
+    sharedUiEventViewModel: SharedUiEventViewModel,
+) {
     val requestNavController = rememberNavController()
-    NavHost(navController = requestNavController, startDestination = BottomBarScreensRoute.RequestScreen) {
+    NavHost(
+        navController = requestNavController,
+        startDestination = BottomBarScreensRoute.RequestScreen
+    ) {
         composable<BottomBarScreensRoute.RequestScreen> {
             RequestsScreen(
+                sharedUiEventViewModel = sharedUiEventViewModel,
                 navHostController = requestNavController
             )
         }
@@ -131,6 +150,7 @@ private fun RequestsNavHost() {
                 key = "user- $userId"
             )
             SpecificUserScreen(
+                sharedUiEventViewModel = sharedUiEventViewModel,
                 specificUserViewModel = viewModel
             )
         }
@@ -141,7 +161,10 @@ private fun RequestsNavHost() {
 @Composable
 private fun BlockListNavHost() {
     val blocklistNavController = rememberNavController()
-    NavHost(navController = blocklistNavController, startDestination = BottomBarScreensRoute.TestBlockScreen1) {
+    NavHost(
+        navController = blocklistNavController,
+        startDestination = BottomBarScreensRoute.TestBlockScreen1
+    ) {
         composable<BottomBarScreensRoute.TestBlockScreen1> {
             Text(
                 text = "Block test screen 1",

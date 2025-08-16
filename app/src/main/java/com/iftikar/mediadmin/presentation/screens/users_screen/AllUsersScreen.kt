@@ -10,20 +10,27 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.iftikar.mediadmin.presentation.components.user.UserItemComponent
+import com.iftikar.mediadmin.shared.SharedUiEventViewModel
 
 @Composable
 fun AllUsersScreen(
+    sharedUiEventViewModel: SharedUiEventViewModel,
     allUsersViewModel: AllUsersViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
     val state = allUsersViewModel.state.collectAsStateWithLifecycle()
+    val observeApproval = sharedUiEventViewModel.userApprovedFlow
 
+    LaunchedEffect(observeApproval) {
+        allUsersViewModel.getAllUsers()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -70,17 +77,22 @@ fun AllUsersScreen(
                         .fillMaxWidth()
                         .padding(innerPadding)
                 ) {
-                    val approvedUsers = state.value.users.filter { it.isApproved == 1 && it.block == 0 }
+                    val approvedUsers =
+                        state.value.users.filter { it.isApproved == 1 && it.block == 0 }
                     items(
                         items = approvedUsers,
                         key = {
                             it.userId
                         }
-                    ) {user ->
+                    ) { user ->
                         UserItemComponent(
                             user = user,
                             onClick = {
-                                navHostController.navigate(BottomBarScreensRoute.SpecificUserScreen(userId = user.userId))
+                                navHostController.navigate(
+                                    BottomBarScreensRoute.SpecificUserScreen(
+                                        userId = user.userId
+                                    )
+                                )
                             }
                         )
                     }

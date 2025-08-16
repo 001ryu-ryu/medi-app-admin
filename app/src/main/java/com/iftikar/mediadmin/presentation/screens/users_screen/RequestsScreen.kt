@@ -10,26 +10,36 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.iftikar.mediadmin.presentation.components.user.UserItemComponent
+import com.iftikar.mediadmin.shared.SharedUiEventViewModel
 
 @Composable
 fun RequestsScreen(
-    usersScreenViewModel: AllUsersViewModel = hiltViewModel(),
+    sharedUiEventViewModel: SharedUiEventViewModel,
+    allUsersViewModel: AllUsersViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
-    val state = usersScreenViewModel.state.collectAsStateWithLifecycle()
+    val state = allUsersViewModel.state.collectAsStateWithLifecycle()
+    val observeApproval = sharedUiEventViewModel.userApprovedFlow
+
+    LaunchedEffect(observeApproval) {
+        allUsersViewModel.getAllUsers()
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         when {
             state.value.isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -39,7 +49,8 @@ fun RequestsScreen(
             state.value.error != null -> {
                 state.value.error?.let {
                     Box(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
@@ -50,7 +61,8 @@ fun RequestsScreen(
 
             state.value.users.isEmpty() -> {
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
@@ -60,7 +72,8 @@ fun RequestsScreen(
 
             state.value.users.isNotEmpty() -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(innerPadding)
                 ) {
                     val requests = state.value.users.filter { it.isApproved == 0 && it.block == 0 }
@@ -69,11 +82,15 @@ fun RequestsScreen(
                         key = {
                             it.userId
                         }
-                    ) {user ->
+                    ) { user ->
                         UserItemComponent(
                             user = user,
                             onClick = {
-                                navHostController.navigate(BottomBarScreensRoute.SpecificUserScreen(userId = user.userId))
+                                navHostController.navigate(
+                                    BottomBarScreensRoute.SpecificUserScreen(
+                                        userId = user.userId
+                                    )
+                                )
                             }
                         )
                     }

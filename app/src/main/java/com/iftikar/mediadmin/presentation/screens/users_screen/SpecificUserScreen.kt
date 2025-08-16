@@ -22,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.iftikar.mediadmin.domain.model.User
+import com.iftikar.mediadmin.shared.SharedUiEventViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpecificUserScreen(
+    sharedUiEventViewModel: SharedUiEventViewModel,
     specificUserViewModel: SpecificUserViewModel
 ) {
     val context = LocalContext.current
@@ -34,12 +36,14 @@ fun SpecificUserScreen(
     val approveUserFlow = specificUserViewModel.approveUserState
     LaunchedEffect(key1 = approveUserFlow) {
         approveUserFlow.collect { event ->
-            when(event) {
+            when (event) {
                 is ApproveUserEvent.ShowMessage -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
 
             }
+
+            sharedUiEventViewModel.emitUserApproved()
         }
 
 
@@ -68,7 +72,7 @@ fun SpecificUserScreen(
                             }
                         }
                     }
-                    )
+                )
             }
         }
     ) { innerPadding ->

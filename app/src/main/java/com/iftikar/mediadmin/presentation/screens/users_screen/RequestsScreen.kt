@@ -67,14 +67,8 @@ fun RequestsScreen(
 
             state.value.users.isEmpty() -> {
                 val requests = state.value.users.filter { it.isApproved == 0 && it.block == 0 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Empty List")
-                }
+
+
             }
 
             state.value.users.isNotEmpty() -> {
@@ -84,6 +78,17 @@ fun RequestsScreen(
                         .padding(innerPadding)
                 ) {
                     val requests = state.value.users.filter { it.isApproved == 0 && it.block == 0 }
+                    if (requests.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Empty List")
+                            }
+                        }
+                    }
                     items(
                         items = requests,
                         key = {

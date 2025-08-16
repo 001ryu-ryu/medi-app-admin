@@ -29,7 +29,6 @@ import androidx.navigation.toRoute
 @Composable
 fun UsersScreen(
 ) {
-    // Use a dedicated controller for the Users screen's internal navigation
     val usersRootNavController = rememberNavController()
 
     Scaffold(
@@ -110,7 +109,7 @@ private fun UserScreenNavHost(
                 key = "user- $userId"
             )
             SpecificUserScreen(
-                specificUserViewModel = viewModel
+                specificUserViewModel = viewModel,
             )
         }
     }

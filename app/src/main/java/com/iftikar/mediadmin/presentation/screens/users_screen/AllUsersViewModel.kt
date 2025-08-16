@@ -7,13 +7,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UsersScreenViewModel @Inject constructor(private val getAllUsersUseCase: GetAllUsersUseCase) :
+class AllUsersViewModel @Inject constructor(private val getAllUsersUseCase: GetAllUsersUseCase) :
     ViewModel() {
-    private val _state = MutableStateFlow<UsersScreenState>(UsersScreenState.Idle)
+    private val _state = MutableStateFlow(AllUsersState())
     val state = _state.asStateFlow()
 
     init {
@@ -22,16 +23,24 @@ class UsersScreenViewModel @Inject constructor(private val getAllUsersUseCase: G
 
     fun getAllUsers() {
         viewModelScope.launch(Dispatchers.IO) {
-            _state.value = UsersScreenState.Loading
+            _state.update {
+                it.copy(isLoading = true)
+            }
             getAllUsersUseCase().collect { apiOperation ->
                 apiOperation.onSuccess { users ->
-                    _state.value = UsersScreenState.Success(
-                        data = users
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            users = users
+                        )
+                    }
                 }.onFailure { exception ->
-                    _state.value = UsersScreenState.Failure(
-                        error = exception.message ?: "Unknown error!"
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = exception.message ?: "Some error occurred!"
+                        )
+                    }
                 }
             }
         }

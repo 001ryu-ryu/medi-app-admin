@@ -66,6 +66,7 @@ fun RequestsScreen(
             }
 
             state.value.users.isEmpty() -> {
+                val requests = state.value.users.filter { it.isApproved == 0 && it.block == 0 }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

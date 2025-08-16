@@ -1,5 +1,6 @@
 package com.iftikar.mediadmin.presentation.screens.users_screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,10 +27,16 @@ fun AllUsersScreen(
     navHostController: NavHostController
 ) {
     val state = allUsersViewModel.state.collectAsStateWithLifecycle()
-    val observeApproval = sharedUiEventViewModel.userApprovedFlow
 
-    LaunchedEffect(observeApproval) {
-        allUsersViewModel.getAllUsers()
+    LaunchedEffect(Unit) {
+        Log.d("Approve-Event-Launch", "Launched Block entered")
+        sharedUiEventViewModel.userApprovedFlow.collect {
+            if (it == true) {
+                Log.d("Approve-Event-Users", it.toString())
+                allUsersViewModel.getAllUsers()
+                sharedUiEventViewModel.emitAfterConsumption()
+            }
+        }
     }
 
     Scaffold(

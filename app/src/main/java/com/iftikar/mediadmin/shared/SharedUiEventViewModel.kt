@@ -8,10 +8,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedUiEventViewModel @Inject constructor() : ViewModel() {
-    private val _userApprovedFlow = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    private val _userApprovedFlow = MutableSharedFlow<Boolean>(replay = 1)
     val userApprovedFlow = _userApprovedFlow.asSharedFlow()
 
     fun emitUserApproved() {
         _userApprovedFlow.tryEmit(true)
+    }
+
+    fun emitAfterConsumption() {
+        _userApprovedFlow.tryEmit(false)
     }
 }

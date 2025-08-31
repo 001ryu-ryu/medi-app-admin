@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,15 +37,11 @@ fun AllUsersScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
         when {
             state.value.isLoading -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                        .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -58,8 +52,7 @@ fun AllUsersScreen(
                 state.value.error?.let {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(it)
@@ -70,8 +63,7 @@ fun AllUsersScreen(
             state.value.users.isEmpty() -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                        .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("Empty List")
@@ -82,7 +74,6 @@ fun AllUsersScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(innerPadding)
                 ) {
                     val approvedUsers =
                         state.value.users.filter { it.isApproved == 1 && it.block == 0 }
@@ -106,7 +97,6 @@ fun AllUsersScreen(
                 }
             }
         }
-    }
 }
 
 

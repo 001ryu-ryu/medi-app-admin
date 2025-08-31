@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iftikar.mediadmin.domain.usecase.ApproveUserUseCase
+import com.iftikar.mediadmin.domain.usecase.BlockUserUseCase
 import com.iftikar.mediadmin.domain.usecase.GetSpecificUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class SpecificUserViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getSpecificUserUseCase: GetSpecificUserUseCase,
-    private val approveUserUseCase: ApproveUserUseCase
+    private val approveUserUseCase: ApproveUserUseCase,
+    private val blockUserUseCase: BlockUserUseCase
 ) : ViewModel() {
     private val userId: String = checkNotNull(savedStateHandle["userId"])
     private val _state = MutableStateFlow(SpecificUserState())
@@ -77,6 +79,46 @@ class SpecificUserViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     _approveUserEvent.emit(
                         ApproveUserEvent.ShowMessage(it.message ?: "Could not approve user")
+                    )
+                }
+            }
+        }
+    }
+
+    fun blockUser() {
+        viewModelScope.launch {
+            blockUserUseCase(userId, 1).onSuccess { (message, status) ->
+
+                _state.update {
+                    it.copy(
+                        blockMessage = "User blocked successfully"
+                    )
+
+                }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        blockMessage = exception.message ?: "Please try again!"
+                    )
+                }
+            }
+        }
+    }
+
+    fun unblockUser() {
+        viewModelScope.launch {
+            blockUserUseCase(userId, 0).onSuccess { (message, status) ->
+
+                _state.update {
+                    it.copy(
+                        blockMessage = "User unblocked successfully"
+                    )
+
+                }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        blockMessage = exception.message ?: "Please try again!"
                     )
                 }
             }

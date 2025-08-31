@@ -33,7 +33,7 @@ sealed class BottomBarScreensRoute {
     object RequestScreen : BottomBarScreensRoute()
 
     @Serializable
-    object TestBlockScreen1 : BottomBarScreensRoute()
+    object BlockScreen : BottomBarScreensRoute()
 
 
 }

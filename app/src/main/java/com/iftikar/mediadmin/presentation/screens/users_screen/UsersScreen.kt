@@ -32,7 +32,6 @@ fun UsersScreen(
 ) {
     val sharedUiEventViewModel: SharedUiEventViewModel = hiltViewModel()
     val usersRootNavController = rememberNavController()
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -59,7 +58,7 @@ fun UsersScreen(
             }
 
             composable(BottomBarRoutes.BlockList.route) {
-                BlockListNavHost()
+                BlockListNavHost(sharedUiEventViewModel)
             }
         }
     }
@@ -159,16 +158,26 @@ private fun RequestsNavHost(
 
 
 @Composable
-private fun BlockListNavHost() {
+private fun BlockListNavHost(
+    sharedUiEventViewModel: SharedUiEventViewModel,
+) {
     val blocklistNavController = rememberNavController()
     NavHost(
         navController = blocklistNavController,
-        startDestination = BottomBarScreensRoute.TestBlockScreen1
+        startDestination = BottomBarScreensRoute.BlockScreen
     ) {
-        composable<BottomBarScreensRoute.TestBlockScreen1> {
-            Text(
-                text = "Block test screen 1",
-                modifier = Modifier.systemBarsPadding()
+        composable<BottomBarScreensRoute.BlockScreen> {
+            BlockedScreen(navHostController = blocklistNavController)
+        }
+
+        composable<BottomBarScreensRoute.SpecificUserScreen> {
+            val userId = it.toRoute<BottomBarScreensRoute.SpecificUserScreen>().userId
+            val viewModel = hiltViewModel<SpecificUserViewModel>(
+                key = "user- $userId"
+            )
+            SpecificUserScreen(
+                sharedUiEventViewModel = sharedUiEventViewModel,
+                specificUserViewModel = viewModel
             )
         }
     }

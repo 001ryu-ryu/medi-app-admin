@@ -89,6 +89,7 @@ fun SpecificUserScreen(
                         TextButton(
                             onClick = {
                                 specificUserViewModel.approveUser(1)
+
                             }
                         ) {
                             Text(
@@ -98,15 +99,32 @@ fun SpecificUserScreen(
                         }
                     }
 
+
+
                     if (user.isApproved == 1 && user.block == 0) {
                         TextButton(
                             onClick = {
-
+                                specificUserViewModel.blockUser()
+                                Toast.makeText(context, state.value.blockMessage, Toast.LENGTH_SHORT).show()
                             }
                         ) {
                             Text(
                                 text = "Block",
                                 color = Color.Red
+                            )
+                        }
+                    }
+
+                    if (user.isApproved == 1 && user.block == 1) {
+                        TextButton(
+                            onClick = {
+                                specificUserViewModel.unblockUser()
+                                Toast.makeText(context, state.value.blockMessage, Toast.LENGTH_SHORT).show()
+                            }
+                        ) {
+                            Text(
+                                text = "Unblock",
+                                color = Color.Green
                             )
                         }
                     }

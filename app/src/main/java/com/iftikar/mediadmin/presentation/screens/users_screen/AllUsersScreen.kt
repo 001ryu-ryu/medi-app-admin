@@ -37,6 +37,10 @@ fun AllUsersScreen(
         }
     }
 
+    LaunchedEffect(true) {
+        allUsersViewModel.getAllUsers()
+    }
+
         when {
             state.value.isLoading -> {
                 Box(

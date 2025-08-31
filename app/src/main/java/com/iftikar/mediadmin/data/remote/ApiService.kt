@@ -1,6 +1,6 @@
 package com.iftikar.mediadmin.data.remote
 
-import com.iftikar.mediadmin.data.remote.model.ApproveUserResponse
+import com.iftikar.mediadmin.data.remote.model.ModifyUserResponse
 import com.iftikar.mediadmin.data.remote.model.InsertProductResponseDto
 import com.iftikar.mediadmin.domain.model.Product
 import com.iftikar.mediadmin.domain.model.User
@@ -28,7 +28,7 @@ interface ApiService {
     suspend fun approveUser(
         @Field("user_id") userId: String,
         @Field("approve") approve: Int
-    ): Response<ApproveUserResponse>
+    ): Response<ModifyUserResponse>
 
     @GET("getAllProducts")
     fun getProducts(): Call<List<Product>>
@@ -47,6 +47,14 @@ interface ApiService {
         @Field("category") category: String,
         @Field("stock") stock: Int,
     ): Response<InsertProductResponseDto>
+
+    // Block user
+    @FormUrlEncoded
+    @PATCH("blockUser")
+    suspend fun blockUser(
+        @Field("user_id") userId: String,
+        @Field("block") blockModify: Int
+    ): Response<ModifyUserResponse>
 }
 
 

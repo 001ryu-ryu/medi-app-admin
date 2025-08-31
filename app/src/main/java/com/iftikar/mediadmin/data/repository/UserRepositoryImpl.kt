@@ -3,7 +3,7 @@ package com.iftikar.mediadmin.data.repository
 import android.util.Log
 import com.iftikar.mediadmin.data.remote.ApiOperation
 import com.iftikar.mediadmin.data.remote.ApiService
-import com.iftikar.mediadmin.data.remote.model.ApproveUserResponse
+import com.iftikar.mediadmin.data.remote.model.ModifyUserResponse
 import com.iftikar.mediadmin.domain.model.User
 import com.iftikar.mediadmin.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
@@ -57,7 +57,7 @@ class UserRepositoryImpl @Inject constructor(private val apiService: ApiService)
     override suspend fun approveUser(
         userId: String,
         approval: Int
-    ): ApiOperation<ApproveUserResponse> {
+    ): ApiOperation<ModifyUserResponse> {
         val response = apiService.approveUser(userId = userId, approve = approval)
         return try {
             if (response.isSuccessful) {
@@ -80,6 +80,27 @@ class UserRepositoryImpl @Inject constructor(private val apiService: ApiService)
             return ApiOperation.Failure(
                 exception = e
             )
+        }
+    }
+
+    override suspend fun blockUser(
+        userId: String,
+        blockModify: Int
+    ): ApiOperation<ModifyUserResponse> {
+        val response = apiService.blockUser(userId, blockModify)
+        return try {
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    ApiOperation.Success(body)
+                } else {
+                    ApiOperation.Failure(NullPointerException("Response not found"))
+                }
+            } else {
+                ApiOperation.Failure(Exception("Operation failed!"))
+            }
+        } catch (e: Exception) {
+            ApiOperation.Failure(Exception("Could not modify the user"))
         }
     }
 }

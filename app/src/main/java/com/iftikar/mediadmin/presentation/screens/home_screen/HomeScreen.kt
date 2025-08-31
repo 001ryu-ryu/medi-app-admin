@@ -52,7 +52,7 @@ fun HomeScreen(navHostController: NavHostController) {
                         image = R.drawable.products,
                         text = "Products",
                         onClick = {
-                            // todo navigation to product screen
+                            navHostController.navigate(Routes.AllProductsScreen)
                         }
                     )
                 }

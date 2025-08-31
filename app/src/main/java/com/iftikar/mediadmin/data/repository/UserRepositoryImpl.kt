@@ -3,7 +3,7 @@ package com.iftikar.mediadmin.data.repository
 import android.util.Log
 import com.iftikar.mediadmin.data.remote.ApiOperation
 import com.iftikar.mediadmin.data.remote.ApiService
-import com.iftikar.mediadmin.domain.model.ApproveUserResponse
+import com.iftikar.mediadmin.data.remote.model.ApproveUserResponse
 import com.iftikar.mediadmin.domain.model.User
 import com.iftikar.mediadmin.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow

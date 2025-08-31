@@ -1,7 +1,10 @@
 package com.iftikar.mediadmin.data.remote
 
-import com.iftikar.mediadmin.domain.model.ApproveUserResponse
+import com.iftikar.mediadmin.data.remote.model.ApproveUserResponse
+import com.iftikar.mediadmin.data.remote.model.InsertProductResponseDto
+import com.iftikar.mediadmin.domain.model.Product
 import com.iftikar.mediadmin.domain.model.User
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -26,4 +29,31 @@ interface ApiService {
         @Field("user_id") userId: String,
         @Field("approve") approve: Int
     ): Response<ApproveUserResponse>
+
+    @GET("getAllProducts")
+    fun getProducts(): Call<List<Product>>
+
+    @FormUrlEncoded
+    @POST("getSpecificProd")
+    suspend fun getSpecificProduct(
+        @Field("product_id") productId: String
+    ): Response<List<Product>>
+
+    @FormUrlEncoded
+    @POST("insertProducts")
+    suspend fun insertProduct(
+        @Field("name") name: String,
+        @Field("price") price: Double,
+        @Field("category") category: String,
+        @Field("stock") stock: Int,
+    ): Response<InsertProductResponseDto>
 }
+
+
+
+
+
+
+
+
+

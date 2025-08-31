@@ -1,4 +1,4 @@
-package com.iftikar.mediadmin.domain.model
+package com.iftikar.mediadmin.data.remote.model
 
 data class ApproveUserResponse(
     val message: String,

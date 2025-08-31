@@ -44,6 +44,11 @@ android {
 
 dependencies {
 
+    //Room
+    implementation("androidx.room:room-runtime:2.7.2")
+    ksp("androidx.room:room-compiler:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+
     // airbnb lottie composable
     implementation("com.airbnb.android:lottie-compose:6.6.7")
     // Retrofit
